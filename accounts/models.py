@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
+from django.conf import settings
 
 class User(AbstractUser):
     class Roles(models.TextChoices):
@@ -15,3 +15,16 @@ class User(AbstractUser):
 
     def is_teacher(self):
         return self.role == self.Roles.TEACHER
+
+
+class StatusUpdate(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="status_updates",
+    )
+    text = models.TextField(max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Status by {self.user.username} at {self.created_at:%Y-%m-%d %H:%M}"
