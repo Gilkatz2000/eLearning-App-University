@@ -1,0 +1,12 @@
+<h1>Courses</h1>
+
+<ul>
+  {% for c in courses %}
+    <li>
+      <a href="{% url 'course_detail' c.id %}">{{ c.title }}</a>
+      (Teacher: {{ c.teacher.username }})
+    </li>
+  {% empty %}
+    <li>No courses yet.</li>
+  {% endfor %}
+</ul>
