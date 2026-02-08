@@ -1,0 +1,15 @@
+<h1>Notifications</h1>
+
+{% if notifications %}
+  <ul>
+    {% for n in notifications %}
+      <li>
+        {% if not n.is_read %}<strong>{% endif %}
+        {{ n.text }} — {{ n.created_at }}
+        {% if not n.is_read %}</strong>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No notifications yet.</p>
+{% endif %}
