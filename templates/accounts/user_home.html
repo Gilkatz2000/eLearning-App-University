@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile_user.username }}{% endblock %}
+
+{% block content %}
+<h1>{{ profile_user.username }}'s Home</h1>
+
+<p><strong>Role:</strong> {{ profile_user.role }}</p>
+
+{% if profile_user.photo %}
+  <img src="{{ profile_user.photo.url }}" alt="Profile photo" style="max-width:200px;">
+{% endif %}
+
+{% if can_post %}
+  <h2>Post a status update</h2>
+  <form method="post" action="{% url 'post_status_update' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Post</button>
+  </form>
+{% endif %}
+
+<hr>
+
+<h2>Status updates</h2>
+<ul>
+  {% for u in updates %}
+    <li>
+      {{ u.text }}<br>
+      <small>{{ u.created_at }}</small>
+    </li>
+  {% empty %}
+    <li>No updates yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
