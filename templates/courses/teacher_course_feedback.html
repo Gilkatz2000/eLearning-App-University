@@ -1,0 +1,21 @@
+<h1>Feedback for: {{ course.title }}</h1>
+
+{% if avg_rating %}
+  <p><strong>Average rating:</strong> {{ avg_rating|floatformat:1 }}/5</p>
+{% else %}
+  <p><strong>Average rating:</strong> No feedback yet</p>
+{% endif %}
+
+<ul>
+  {% for fb in feedbacks %}
+    <li>
+      <strong>{{ fb.student.username }}</strong> — {{ fb.rating }}/5<br>
+      {% if fb.comment %}{{ fb.comment }}<br>{% endif %}
+      <small>{{ fb.created_at }}</small>
+    </li>
+  {% empty %}
+    <li>No feedback yet.</li>
+  {% endfor %}
+</ul>
+
+<p><a href="{% url 'course_detail' course.id %}">Back to course</a></p>

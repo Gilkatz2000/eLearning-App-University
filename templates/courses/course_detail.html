@@ -1,26 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+
 <h1>{{ course.title }}</h1>
 <p>{{ course.description }}</p>
 <p><strong>Teacher:</strong> {{ course.teacher.username }}</p>
 
+{% if avg_rating %}
+  <p><strong>Average rating:</strong> {{ avg_rating|floatformat:1 }}/5</p>
+{% else %}
+  <p><strong>Average rating:</strong> No feedback yet</p>
+{% endif %}
+
+{% if is_owner_teacher %}
+  <p><a href="{% url 'upload_material' course.id %}">Upload material</a></p>
+  <p><a href="{% url 'teacher_course_feedback' course.id %}">View feedback (teacher)</a></p>
+{% endif %}
+
 <h2>Materials</h2>
 <ul>
   {% for m in course.materials.all %}
-    <li><a href="{{ m.file.url }}">{{ m.title }}</a> — {{ m.uploaded_at }}</li>
+    <li>
+      <a href="{{ m.file.url }}">{{ m.title }}</a>
+      — {{ m.uploaded_at }}
+    </li>
   {% empty %}
     <li>No materials yet.</li>
   {% endfor %}
 </ul>
 
-{% if user.is_authenticated and user.role == "TEACHER" and course.teacher == user %}
-  <p><a href="{% url 'upload_material' course.id %}">Upload material</a></p>
-{% endif %}
-
-{% if user.is_authenticated and user.role == "STUDENT" %}
+{% if user.is_authenticated and user.is_student %}
   {% if enrollment %}
     {% if enrollment.is_blocked %}
       <p><strong>You are blocked from this course.</strong></p>
     {% else %}
       <p><strong>You are enrolled.</strong></p>
+
+      <hr>
+      <h2>Leave feedback</h2>
+
+      <form method="post" action="{% url 'submit_feedback' course.id %}">
+        {% csrf_token %}
+        {{ feedback_form.as_p }}
+        <button type="submit">
+          {% if my_feedback %}Update feedback{% else %}Submit feedback{% endif %}
+        </button>
+      </form>
     {% endif %}
   {% else %}
     <form method="post" action="{% url 'enroll_course' course.id %}">
@@ -30,4 +57,24 @@
   {% endif %}
 {% endif %}
 
+<hr>
+
+<h2>Recent feedback</h2>
+<ul>
+  {% for fb in feedbacks %}
+    <li>
+      <strong>{{ fb.student.username }}</strong>
+      — {{ fb.rating }}/5<br>
+      {% if fb.comment %}
+        {{ fb.comment }}<br>
+      {% endif %}
+      <small>{{ fb.created_at }}</small>
+    </li>
+  {% empty %}
+    <li>No feedback yet.</li>
+  {% endfor %}
+</ul>
+
 <p><a href="{% url 'course_list' %}">Back to courses</a></p>
+
+{% endblock %}

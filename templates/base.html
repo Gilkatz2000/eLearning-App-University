@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}eLearning{% endblock %}</title>
+</head>
+<body>
+
+{% if user.is_authenticated %}
+  <p>
+    Logged in as: <strong>{{ user.username }}</strong> ({{ user.role }})
+    | <a href="{% url 'course_list' %}">Courses</a>
+    | <a href="{% url 'logout' %}">Logout</a>
+  </p>
+{% else %}
+  <p>
+    Not logged in
+    | <a href="{% url 'login' %}">Login</a>
+  </p>
+{% endif %}
+<hr>
+
+{% block content %}{% endblock %}
+
+</body>
+</html>
