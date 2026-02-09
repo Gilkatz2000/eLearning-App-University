@@ -11,6 +11,11 @@
     Logged in as: <strong>{{ user.username }}</strong> ({{ user.role }})
     | <a href="{% url 'user_home' user.username %}">My Home</a>
     | <a href="{% url 'course_list' %}">Courses</a>
+
+    {% if user.role == "TEACHER" %}
+      | <a href="{% url 'teacher_search' %}">Search Users</a>
+    {% endif %}
+
     | <a href="{% url 'logout' %}">Logout</a>
   </p>
 {% else %}
@@ -19,6 +24,7 @@
     | <a href="{% url 'login' %}">Login</a>
   </p>
 {% endif %}
+
 <hr>
 
 {% block content %}{% endblock %}
