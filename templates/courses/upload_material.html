@@ -1,0 +1,9 @@
+<h1>Upload Material: {{ course.title }}</h1>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Upload</button>
+</form>
+
+<p><a href="{% url 'course_detail' course.id %}">Back to course</a></p>
