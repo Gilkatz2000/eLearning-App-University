@@ -39,10 +39,18 @@ def course_detail(request, course_id):
     my_feedback = None
     feedback_form = None
 
-    # Feedback list + average visible to everyone (fine for marking)
+    # Feedback list + average (visible to everyone)
     feedbacks = course.feedbacks.select_related("student").order_by("-created_at")
     avg_rating = feedbacks.aggregate(avg=Avg("rating"))["avg"]
 
+    # ✅ FIX: compute teacher ownership in view (not template)
+    is_owner_teacher = (
+        request.user.is_authenticated
+        and request.user.is_teacher()
+        and course.teacher_id == request.user.id
+    )
+
+    # Student-only feedback logic
     if request.user.is_authenticated and request.user.is_student():
         enrollment = Enrollment.objects.filter(course=course, student=request.user).first()
         my_feedback = Feedback.objects.filter(course=course, student=request.user).first()
@@ -58,6 +66,7 @@ def course_detail(request, course_id):
             "avg_rating": avg_rating,
             "my_feedback": my_feedback,
             "feedback_form": feedback_form,
+            "is_owner_teacher": is_owner_teacher,  # 👈 used in template
         },
     )
 
@@ -90,7 +99,7 @@ def enroll_course(request, course_id):
 def submit_feedback(request, course_id):
     course = get_object_or_404(Course, id=course_id)
 
-    # Must be enrolled AND not blocked (matches your app logic)
+    # Must be enrolled AND not blocked
     enrollment = Enrollment.objects.filter(course=course, student=request.user).first()
     if not enrollment or enrollment.is_blocked:
         raise PermissionDenied
@@ -104,7 +113,7 @@ def submit_feedback(request, course_id):
         feedback.student = request.user
         feedback.save()
 
-        # Optional: notify teacher (nice + visible functionality)
+        # Notify teacher
         Notification.objects.create(
             to_user=course.teacher,
             text=f"{request.user.username} left feedback on '{course.title}'",
@@ -118,8 +127,8 @@ def submit_feedback(request, course_id):
 def teacher_course_feedback(request, course_id):
     course = get_object_or_404(Course, id=course_id)
 
-    # Only owner teacher can view
-    if course.teacher != request.user:
+    # Only the owner teacher can view
+    if course.teacher_id != request.user.id:
         raise PermissionDenied
 
     feedbacks = course.feedbacks.select_related("student").order_by("-created_at")
@@ -128,7 +137,11 @@ def teacher_course_feedback(request, course_id):
     return render(
         request,
         "courses/teacher_course_feedback.html",
-        {"course": course, "feedbacks": feedbacks, "avg_rating": avg_rating},
+        {
+            "course": course,
+            "feedbacks": feedbacks,
+            "avg_rating": avg_rating,
+        },
     )
 
 
@@ -136,9 +149,9 @@ def teacher_course_feedback(request, course_id):
 def upload_material(request, course_id):
     course = get_object_or_404(Course, id=course_id)
 
-    # Only the course owner can upload
-    if course.teacher != request.user:
-        return redirect("course_detail", course_id=course.id)
+    # Only the owner teacher can upload
+    if course.teacher_id != request.user.id:
+        raise PermissionDenied
 
     if request.method == "POST":
         form = CourseMaterialForm(request.POST, request.FILES)
@@ -161,4 +174,8 @@ def upload_material(request, course_id):
     else:
         form = CourseMaterialForm()
 
-    return render(request, "courses/upload_material.html", {"course": course, "form": form})
+    return render(
+        request,
+        "courses/upload_material.html",
+        {"course": course, "form": form},
+    )

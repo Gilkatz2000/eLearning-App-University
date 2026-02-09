@@ -1,3 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+
 <h1>{{ course.title }}</h1>
 <p>{{ course.description }}</p>
 <p><strong>Teacher:</strong> {{ course.teacher.username }}</p>
@@ -8,7 +14,7 @@
   <p><strong>Average rating:</strong> No feedback yet</p>
 {% endif %}
 
-{% if user.is_authenticated and user.role == "TEACHER" and course.teacher == user %}
+{% if is_owner_teacher %}
   <p><a href="{% url 'upload_material' course.id %}">Upload material</a></p>
   <p><a href="{% url 'teacher_course_feedback' course.id %}">View feedback (teacher)</a></p>
 {% endif %}
@@ -16,13 +22,16 @@
 <h2>Materials</h2>
 <ul>
   {% for m in course.materials.all %}
-    <li><a href="{{ m.file.url }}">{{ m.title }}</a> — {{ m.uploaded_at }}</li>
+    <li>
+      <a href="{{ m.file.url }}">{{ m.title }}</a>
+      — {{ m.uploaded_at }}
+    </li>
   {% empty %}
     <li>No materials yet.</li>
   {% endfor %}
 </ul>
 
-{% if user.is_authenticated and user.role == "STUDENT" %}
+{% if user.is_authenticated and user.is_student %}
   {% if enrollment %}
     {% if enrollment.is_blocked %}
       <p><strong>You are blocked from this course.</strong></p>
@@ -49,12 +58,16 @@
 {% endif %}
 
 <hr>
+
 <h2>Recent feedback</h2>
 <ul>
   {% for fb in feedbacks %}
     <li>
-      <strong>{{ fb.student.username }}</strong> — {{ fb.rating }}/5<br>
-      {% if fb.comment %}{{ fb.comment }}<br>{% endif %}
+      <strong>{{ fb.student.username }}</strong>
+      — {{ fb.rating }}/5<br>
+      {% if fb.comment %}
+        {{ fb.comment }}<br>
+      {% endif %}
       <small>{{ fb.created_at }}</small>
     </li>
   {% empty %}
@@ -63,3 +76,5 @@
 </ul>
 
 <p><a href="{% url 'course_list' %}">Back to courses</a></p>
+
+{% endblock %}
