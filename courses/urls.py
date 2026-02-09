@@ -7,4 +7,7 @@ urlpatterns = [
     path("<int:course_id>/", views.course_detail, name="course_detail"),
     path("<int:course_id>/enroll/", views.enroll_course, name="enroll_course"),
     path("<int:course_id>/upload/", views.upload_material, name="upload_material"),
+
+    path("<int:course_id>/feedback/", views.submit_feedback, name="submit_feedback"),
+    path("teacher/courses/<int:course_id>/feedback/", views.teacher_course_feedback, name="teacher_course_feedback"),
 ]
