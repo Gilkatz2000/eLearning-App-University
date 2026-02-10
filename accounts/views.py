@@ -7,6 +7,8 @@ from django.views.decorators.http import require_POST
 from .forms import RegisterForm, LoginForm, StatusUpdateForm
 from .models import User, StatusUpdate
 
+from django.db.models import Q
+
 
 def register_view(request):
     if request.method == "POST":
@@ -58,7 +60,6 @@ def user_home(request, username):
         },
     )
 
-
 @login_required
 @require_POST
 def post_status_update(request):
@@ -73,3 +74,23 @@ def post_status_update(request):
         status.save()
 
     return redirect("user_home", username=request.user.username)
+
+@login_required
+def teacher_search(request):
+    if not request.user.is_teacher():
+        raise PermissionDenied
+
+    query = request.GET.get("q", "").strip()
+    results = User.objects.none()
+
+    if query:
+        results = User.objects.filter(
+            Q(username__icontains=query) |
+            Q(email__icontains=query)
+        ).order_by("username")
+
+    return render(
+        request,
+        "accounts/teacher_search.html",
+        {"query": query, "results": results},
+    )

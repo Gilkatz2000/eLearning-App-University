@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Search{% endblock %}
+
+{% block content %}
+<h1>Search users</h1>
+
+<form method="get" action="{% url 'teacher_search' %}">
+  <input type="text" name="q" value="{{ query }}" placeholder="Search by username or email" />
+  <button type="submit">Search</button>
+</form>
+
+<hr>
+
+{% if query %}
+  <h2>Results for "{{ query }}"</h2>
+  <ul>
+    {% for u in results %}
+      <li>
+        <a href="{% url 'user_home' u.username %}">{{ u.username }}</a>
+        — {{ u.role }}
+        {% if u.email %} ({{ u.email }}){% endif %}
+      </li>
+    {% empty %}
+      <li>No users found.</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Type something to search.</p>
+{% endif %}
+
+{% endblock %}
