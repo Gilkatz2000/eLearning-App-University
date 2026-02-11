@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Course Chat</title>
+</head>
+<body>
+
+<h1>Course Chat: {{ course.title }}</h1>
+
+<div id="chat-log" style="border:1px solid #ccc; padding:10px; height:300px; overflow:auto;"></div>
+
+<form id="chat-form" style="margin-top:10px;">
+  <input id="chat-message-input" type="text" size="60" placeholder="Type a message..." autocomplete="off">
+  <button type="submit">Send</button>
+</form>
+
+<script>
+  const courseId = "{{ course.id }}";
+  const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+  const chatSocket = new WebSocket(`${protocol}://${window.location.host}/ws/courses/${courseId}/chat/`);
+
+  const log = document.getElementById("chat-log");
+  const form = document.getElementById("chat-form");
+  const input = document.getElementById("chat-message-input");
+
+  function addLine(line) {
+    const p = document.createElement("p");
+    p.textContent = line;
+    log.appendChild(p);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    addLine(`[${data.timestamp}] ${data.username}: ${data.message}`);
+  };
+
+  chatSocket.onclose = function() {
+    addLine("Disconnected from chat.");
+  };
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const message = input.value.trim();
+    if (!message) return;
+    chatSocket.send(JSON.stringify({message}));
+    input.value = "";
+  });
+</script>
+
+<p><a href="/courses/">Back to courses</a></p>
+
+</body>
+</html>
