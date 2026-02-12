@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Manage Students - {{ course.title }}{% endblock %}
+
+{% block content %}
+<h1>Manage Students: {{ course.title }}</h1>
+
+<ul>
+  {% for e in enrollments %}
+    <li>
+      <strong>{{ e.student.username }}</strong>
+      {% if e.is_blocked %}
+        <span style="color:red;">(blocked)</span>
+        <form method="post" action="{% url 'unblock_student' course.id e.id %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit">Unblock</button>
+        </form>
+      {% else %}
+        <form method="post" action="{% url 'block_student' course.id e.id %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit">Block</button>
+        </form>
+      {% endif %}
+
+      <form method="post" action="{% url 'remove_student' course.id e.id %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">Remove</button>
+      </form>
+    </li>
+  {% empty %}
+    <li>No students enrolled yet.</li>
+  {% endfor %}
+</ul>
+
+<p><a href="{% url 'course_detail' course.id %}">Back to course</a></p>
+{% endblock %}

@@ -10,4 +10,10 @@ urlpatterns = [
 
     path("<int:course_id>/feedback/", views.submit_feedback, name="submit_feedback"),
     path("teacher/courses/<int:course_id>/feedback/", views.teacher_course_feedback, name="teacher_course_feedback"),
+    
+    path("<int:course_id>/enrollments/", views.manage_enrollments, name="manage_enrollments"),
+    path("<int:course_id>/enrollments/<int:enrollment_id>/block/", views.block_student, name="block_student"),
+    path("<int:course_id>/enrollments/<int:enrollment_id>/unblock/", views.unblock_student, name="unblock_student"),
+    path("<int:course_id>/enrollments/<int:enrollment_id>/remove/", views.remove_student, name="remove_student"),
+
 ]
