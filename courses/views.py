@@ -55,7 +55,7 @@ def course_detail(request, course_id):
     if request.user.is_authenticated and request.user.is_student():
         enrollment = Enrollment.objects.filter(course=course, student=request.user).first()
         my_feedback = Feedback.objects.filter(course=course, student=request.user).first()
-        feedback_form = FeedbackForm(instance=my_feedback)
+        feedback_form = FeedbackForm(instance=my_feedback, student=request.user, course=course)
 
     return render(
         request,
@@ -106,7 +106,12 @@ def submit_feedback(request, course_id):
         raise PermissionDenied
 
     existing = Feedback.objects.filter(course=course, student=request.user).first()
-    form = FeedbackForm(request.POST, instance=existing)
+    form = FeedbackForm(
+        request.POST,
+        instance=existing,
+        student=request.user,
+        course=course,
+    )
 
     if form.is_valid():
         feedback = form.save(commit=False)
