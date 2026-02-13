@@ -68,17 +68,20 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 ASGI_APPLICATION = "config.asgi.application"
 
+USE_REDIS = os.environ.get("USE_REDIS", "0") == "1"
+REDIS_HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
+REDIS_PORT = int(os.environ.get("REDIS_PORT", "6379"))
+
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer"
-        if os.environ.get("USE_REDIS", "0") == "1"
-        else "channels.layers.InMemoryChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-        } if os.environ.get("USE_REDIS", "0") == "1" else {},
+        "BACKEND": (
+            "channels_redis.core.RedisChannelLayer"
+            if USE_REDIS
+            else "channels.layers.InMemoryChannelLayer"
+        ),
+        "CONFIG": {"hosts": [(REDIS_HOST, REDIS_PORT)]} if USE_REDIS else {},
     }
 }
-
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
@@ -160,3 +163,9 @@ TEMPLATES = [
 ]
 
 TEMPLATES[0]["DIRS"] = [BASE_DIR / "templates"]
+
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]

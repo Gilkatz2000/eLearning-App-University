@@ -2,32 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}eLearning{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
-<body>
+<body class="{% if user.is_authenticated %}theme-{{ user.theme }}{% else %}theme-default{% endif %}">
 
-{% if user.is_authenticated %}
-  <p>
-    Logged in as: <strong>{{ user.username }}</strong> ({{ user.role }})
-    | <a href="{% url 'user_home' user.username %}">My Home</a>
-    | <a href="{% url 'course_list' %}">Courses</a>
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a class="brand" href="{% url 'course_list' %}">
+        <span class="brand-badge" aria-hidden="true"></span>
+        eLearning
+      </a>
 
-    {% if user.role == "TEACHER" %}
-      | <a href="{% url 'teacher_search' %}">Search Users</a>
+      <nav class="nav-links">
+        {% if user.is_authenticated %}
+          <a href="{% url 'user_home' user.username %}">My Home</a>
+          <a href="{% url 'course_list' %}">Courses</a>
+
+          {% if user.role == "TEACHER" %}
+            <a href="{% url 'teacher_search' %}">Search Users</a>
+          {% endif %}
+
+          <!-- THEME SELECTOR ADDED HERE -->
+          <form method="post" action="{% url 'change_theme' %}" style="display:inline;">
+            {% csrf_token %}
+            <select name="theme" onchange="this.form.submit()">
+              {% for value, label in user.Themes.choices %}
+                <option value="{{ value }}" {% if user.theme == value %}selected{% endif %}>
+                  {{ label }}
+                </option>
+              {% endfor %}
+            </select>
+          </form>
+
+          <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+          <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% if user.is_authenticated %}
+      <div class="card" style="margin-bottom: 16px;">
+        <div class="card-body">
+          <span class="badge">
+            Logged in as: <strong style="margin-left:6px;">{{ user.username }}</strong>
+            <span style="opacity:.7;">({{ user.role }})</span>
+          </span>
+        </div>
+      </div>
     {% endif %}
 
-    | <a href="{% url 'logout' %}">Logout</a>
-  </p>
-{% else %}
-  <p>
-    Not logged in
-    | <a href="{% url 'login' %}">Login</a>
-  </p>
-{% endif %}
+    {# Django messages (if you use them) #}
+    {% if messages %}
+      <div class="stack" style="margin-bottom: 16px;">
+        {% for message in messages %}
+          <div class="alert
+            {% if message.tags == 'success' %}success{% elif message.tags == 'error' %}danger{% elif message.tags == 'warning' %}warn{% else %}info{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
 
-<hr>
-
-{% block content %}{% endblock %}
+    {% block content %}{% endblock %}
+    <div class="footer">© {{ now|date:"Y" }} eLearning</div>
+  </main>
 
 </body>
 </html>
