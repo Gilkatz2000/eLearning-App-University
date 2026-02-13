@@ -1,27 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8" />
   <title>Course Chat</title>
 </head>
 <body>
 
 <h1>Course Chat: {{ course.title }}</h1>
 
+<div style="margin: 8px 0;">
+  <strong>Status:</strong> <span id="chat-status">Connecting…</span>
+</div>
+
 <div id="chat-log" style="border:1px solid #ccc; padding:10px; height:300px; overflow:auto;"></div>
 
 <form id="chat-form" style="margin-top:10px;">
   <input id="chat-message-input" type="text" size="60" placeholder="Type a message..." autocomplete="off">
-  <button type="submit">Send</button>
+  <button id="chat-send-btn" type="submit">Send</button>
 </form>
 
 <script>
   const courseId = "{{ course.id }}";
   const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-  const chatSocket = new WebSocket(`${protocol}://${window.location.host}/ws/courses/${courseId}/chat/`);
+  const wsUrl = `${protocol}://${window.location.host}/ws/courses/${courseId}/chat/`;
 
   const log = document.getElementById("chat-log");
   const form = document.getElementById("chat-form");
   const input = document.getElementById("chat-message-input");
+  const statusEl = document.getElementById("chat-status");
+  const sendBtn = document.getElementById("chat-send-btn");
+
+  function setStatus(text) {
+    statusEl.textContent = text;
+  }
 
   function addLine(line) {
     const p = document.createElement("p");
@@ -30,20 +41,51 @@
     log.scrollTop = log.scrollHeight;
   }
 
+  // Create socket
+  const chatSocket = new WebSocket(wsUrl);
+
+  chatSocket.onopen = function() {
+    setStatus("✅ Connected");
+    addLine("✅ Connected to chat.");
+    input.focus();
+  };
+
   chatSocket.onmessage = function(e) {
-    const data = JSON.parse(e.data);
-    addLine(`[${data.timestamp}] ${data.username}: ${data.message}`);
+    try {
+      const data = JSON.parse(e.data);
+      const ts = data.timestamp ? data.timestamp : "";
+      const user = data.username ? data.username : "unknown";
+      const msg = data.message ? data.message : "";
+      addLine(`[${ts}] ${user}: ${msg}`);
+    } catch (err) {
+      addLine("⚠️ Received a message that could not be parsed.");
+    }
+  };
+
+  chatSocket.onerror = function() {
+    setStatus("⚠️ Error");
+    addLine("⚠️ WebSocket error.");
   };
 
   chatSocket.onclose = function() {
+    setStatus("🔌 Disconnected");
     addLine("Disconnected from chat.");
+    sendBtn.disabled = true;
+    input.disabled = true;
   };
 
   form.addEventListener("submit", function(e) {
     e.preventDefault();
+
+    if (chatSocket.readyState !== WebSocket.OPEN) {
+      addLine("⚠️ Not connected. Refresh the page to reconnect.");
+      return;
+    }
+
     const message = input.value.trim();
     if (!message) return;
-    chatSocket.send(JSON.stringify({message}));
+
+    chatSocket.send(JSON.stringify({ message }));
     input.value = "";
   });
 </script>

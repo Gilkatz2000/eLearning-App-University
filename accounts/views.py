@@ -94,3 +94,13 @@ def teacher_search(request):
         "accounts/teacher_search.html",
         {"query": query, "results": results},
     )
+
+@login_required
+def change_theme(request):
+    if request.method == "POST":
+        theme = request.POST.get("theme")
+        allowed = {choice[0] for choice in User.Themes.choices}
+        if theme in allowed:
+            request.user.theme = theme
+            request.user.save(update_fields=["theme"])
+    return redirect(request.META.get("HTTP_REFERER", "course_list"))

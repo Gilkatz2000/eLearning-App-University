@@ -9,4 +9,6 @@ urlpatterns = [
     path("users/<str:username>/", views.user_home, name="user_home"),
     path("status/post/", views.post_status_update, name="post_status_update"),
     path("search/", views.teacher_search, name="teacher_search"),
+
+    path("theme/change/", views.change_theme, name="change_theme"),
 ]
