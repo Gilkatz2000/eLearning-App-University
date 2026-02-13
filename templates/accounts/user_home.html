@@ -5,6 +5,10 @@
 {% block content %}
 <h1>{{ profile_user.username }}'s Home</h1>
 
+{% if profile_user.first_name or profile_user.last_name %}
+  <p><strong>Name:</strong> {{ profile_user.first_name }} {{ profile_user.last_name }}</p>
+{% endif %}
+
 <p><strong>Role:</strong> {{ profile_user.role }}</p>
 
 {% if profile_user.photo %}

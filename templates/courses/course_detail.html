@@ -5,42 +5,71 @@
 {% block content %}
 
 <h1>{{ course.title }}</h1>
-<p>{{ course.description }}</p>
-<p><strong>Teacher:</strong> {{ course.teacher.username }}</p>
+
+{% if course.description %}
+  <p>{{ course.description }}</p>
+{% endif %}
+
+<p>
+  <strong>Teacher:</strong>
+  <a href="{% url 'user_home' course.teacher.username %}">
+    {{ course.teacher.username }}
+  </a>
+  {% if course.teacher.first_name or course.teacher.last_name %}
+    <span style="opacity: .8;">( {{ course.teacher.first_name }} {{ course.teacher.last_name }} )</span>
+  {% endif %}
+</p>
 
 {% if avg_rating %}
   <p><strong>Average rating:</strong> {{ avg_rating|floatformat:1 }}/5</p>
 {% else %}
-  <p><strong>Average rating:</strong> No feedback yet</p>
+  <p><strong>Average rating:</strong> <em>No feedback yet</em></p>
 {% endif %}
 
 {% if is_owner_teacher %}
-  <p><a href="{% url 'upload_material' course.id %}">Upload material</a></p>
-  <p><a href="{% url 'teacher_course_feedback' course.id %}">View feedback (teacher)</a></p>
-  <p><a href="{% url 'manage_enrollments' course.id %}">Manage students (block/remove)</a></p>
+  <div style="margin: 14px 0; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+    <strong>Teacher actions</strong>
+    <ul style="margin: 8px 0 0 18px;">
+      <li><a href="{% url 'upload_material' course.id %}">Upload material</a></li>
+      <li><a href="{% url 'teacher_course_feedback' course.id %}">View feedback</a></li>
+      <li><a href="{% url 'manage_enrollments' course.id %}">Manage students (block/remove)</a></li>
+    </ul>
+  </div>
 {% endif %}
 
+<hr>
+
 <h2>Materials</h2>
-<ul>
-  {% for m in course.materials.all %}
-    <li>
-      <a href="{{ m.file.url }}">{{ m.title }}</a>
-      — {{ m.uploaded_at }}
-    </li>
-  {% empty %}
-    <li>No materials yet.</li>
-  {% endfor %}
-</ul>
+{% if course.materials.all %}
+  <ul>
+    {% for m in course.materials.all %}
+      <li style="margin: 8px 0;">
+        <a href="{{ m.file.url }}"><strong>{{ m.title }}</strong></a>
+        <span style="opacity: .75;">— uploaded {{ m.uploaded_at|date:"Y-m-d H:i" }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p><em>No materials yet.</em></p>
+{% endif %}
+
+<hr>
 
 {% if user.is_authenticated and user.is_student %}
   {% if enrollment %}
     {% if enrollment.is_blocked %}
-      <p><strong>You are blocked from this course.</strong></p>
+      <p style="padding: 10px; border: 1px solid #f5c2c7; background: #f8d7da; border-radius: 8px;">
+        <strong>You are blocked from this course.</strong>
+      </p>
     {% else %}
-      <p><strong>You are enrolled.</strong></p>
+      <p style="padding: 10px; border: 1px solid #cfe2ff; background: #e7f1ff; border-radius: 8px;">
+        <strong>You are enrolled.</strong>
+      </p>
 
-      <hr>
       <h2>Leave feedback</h2>
+      <p style="opacity: .8;">
+        Your feedback helps the teacher improve the course.
+      </p>
 
       <form method="post" action="{% url 'submit_feedback' course.id %}">
         {% csrf_token %}
@@ -61,20 +90,33 @@
 <hr>
 
 <h2>Recent feedback</h2>
-<ul>
-  {% for fb in feedbacks %}
-    <li>
-      <strong>{{ fb.student.username }}</strong>
-      — {{ fb.rating }}/5<br>
-      {% if fb.comment %}
-        {{ fb.comment }}<br>
-      {% endif %}
-      <small>{{ fb.created_at }}</small>
-    </li>
-  {% empty %}
-    <li>No feedback yet.</li>
-  {% endfor %}
-</ul>
+{% if feedbacks %}
+  <ul>
+    {% for fb in feedbacks %}
+      <li style="margin: 10px 0;">
+        <strong>
+          <a href="{% url 'user_home' fb.student.username %}">
+            {{ fb.student.username }}
+          </a>
+        </strong>
+
+        {% if fb.student.first_name or fb.student.last_name %}
+          <span style="opacity: .8;">( {{ fb.student.first_name }} {{ fb.student.last_name }} )</span>
+        {% endif %}
+
+        <div style="opacity: .85;">Rating: {{ fb.rating }}/5</div>
+
+        {% if fb.comment %}
+          <div>{{ fb.comment }}</div>
+        {% endif %}
+
+        <small style="opacity: .7;">{{ fb.created_at|date:"Y-m-d H:i" }}</small>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p><em>No feedback yet.</em></p>
+{% endif %}
 
 <p><a href="{% url 'course_list' %}">Back to courses</a></p>
 

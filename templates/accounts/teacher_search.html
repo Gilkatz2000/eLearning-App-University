@@ -4,29 +4,56 @@
 
 {% block content %}
 <h1>Search users</h1>
+<p>Search by <strong>username</strong> or <strong>email</strong>. Click a user to open their profile.</p>
 
-<form method="get" action="{% url 'teacher_search' %}">
-  <input type="text" name="q" value="{{ query }}" placeholder="Search by username or email" />
+<form method="get" action="{% url 'teacher_search' %}" style="margin: 12px 0;">
+  <input
+    type="text"
+    name="q"
+    value="{{ query }}"
+    placeholder="e.g. alice or alice@example.com"
+    style="min-width: 280px;"
+    autofocus
+  />
   <button type="submit">Search</button>
+
+  {% if query %}
+    <a href="{% url 'teacher_search' %}" style="margin-left: 10px;">Clear</a>
+  {% endif %}
 </form>
 
 <hr>
 
 {% if query %}
-  <h2>Results for "{{ query }}"</h2>
-  <ul>
-    {% for u in results %}
-      <li>
-        <a href="{% url 'user_home' u.username %}">{{ u.username }}</a>
-        — {{ u.role }}
-        {% if u.email %} ({{ u.email }}){% endif %}
-      </li>
-    {% empty %}
-      <li>No users found.</li>
-    {% endfor %}
-  </ul>
+  <h2>Results for “{{ query }}”</h2>
+
+  {% if results %}
+    <ul>
+      {% for u in results %}
+        <li style="margin: 8px 0;">
+          <a href="{% url 'user_home' u.username %}">
+            <strong>{{ u.username }}</strong>
+          </a>
+
+          <span style="opacity: .8;">
+            — {{ u.get_role_display|default:u.role }}
+            {% if u.first_name or u.last_name %}
+              · {{ u.first_name }} {{ u.last_name }}
+            {% endif %}
+            {% if u.email %}
+              · {{ u.email }}
+            {% endif %}
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p><em>No users found.</em></p>
+    <p>Try a shorter search, like just the first few letters of a username.</p>
+  {% endif %}
+
 {% else %}
-  <p>Type something to search.</p>
+  <p><em>Type something above to search.</em></p>
 {% endif %}
 
 {% endblock %}
