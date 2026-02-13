@@ -3,6 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Avg
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
+from django.utils import timezone
 
 from accounts.decorators import teacher_required, student_required
 from notifications.models import Notification
@@ -179,3 +180,82 @@ def upload_material(request, course_id):
         "courses/upload_material.html",
         {"course": course, "form": form},
     )
+
+@teacher_required
+def manage_enrollments(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+
+    # Only owner teacher
+    if course.teacher_id != request.user.id:
+        raise PermissionDenied
+
+    enrollments = course.enrollments.select_related("student").order_by("student__username")
+
+    return render(
+        request,
+        "courses/manage_enrollments.html",
+        {"course": course, "enrollments": enrollments},
+    )
+
+
+@teacher_required
+@require_POST
+def block_student(request, course_id, enrollment_id):
+    course = get_object_or_404(Course, id=course_id)
+    if course.teacher_id != request.user.id:
+        raise PermissionDenied
+
+    enrollment = get_object_or_404(Enrollment, id=enrollment_id, course_id=course_id)
+    enrollment.is_blocked = True
+    enrollment.blocked_at = timezone.now()
+    enrollment.save(update_fields=["is_blocked", "blocked_at"])
+
+    Notification.objects.create(
+        to_user=enrollment.student,
+        text=f"You were blocked from '{course.title}'.",
+        link=f"/courses/{course.id}/",
+    )
+
+    return redirect("manage_enrollments", course_id=course.id)
+
+
+@teacher_required
+@require_POST
+def unblock_student(request, course_id, enrollment_id):
+    course = get_object_or_404(Course, id=course_id)
+    if course.teacher_id != request.user.id:
+        raise PermissionDenied
+
+    enrollment = get_object_or_404(Enrollment, id=enrollment_id, course_id=course_id)
+    enrollment.is_blocked = False
+    enrollment.blocked_at = None
+    enrollment.blocked_reason = ""
+    enrollment.save(update_fields=["is_blocked", "blocked_at", "blocked_reason"])
+
+    Notification.objects.create(
+        to_user=enrollment.student,
+        text=f"You were unblocked in '{course.title}'.",
+        link=f"/courses/{course.id}/",
+    )
+
+    return redirect("manage_enrollments", course_id=course.id)
+
+
+@teacher_required
+@require_POST
+def remove_student(request, course_id, enrollment_id):
+    course = get_object_or_404(Course, id=course_id)
+    if course.teacher_id != request.user.id:
+        raise PermissionDenied
+
+    enrollment = get_object_or_404(Enrollment, id=enrollment_id, course_id=course_id)
+    student = enrollment.student
+    enrollment.delete()
+
+    Notification.objects.create(
+        to_user=student,
+        text=f"You were removed from '{course.title}'.",
+        link=f"/courses/{course.id}/",
+    )
+
+    return redirect("manage_enrollments", course_id=course.id)

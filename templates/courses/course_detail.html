@@ -17,6 +17,7 @@
 {% if is_owner_teacher %}
   <p><a href="{% url 'upload_material' course.id %}">Upload material</a></p>
   <p><a href="{% url 'teacher_course_feedback' course.id %}">View feedback (teacher)</a></p>
+  <p><a href="{% url 'manage_enrollments' course.id %}">Manage students (block/remove)</a></p>
 {% endif %}
 
 <h2>Materials</h2>
