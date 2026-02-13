@@ -1,6 +1,9 @@
+# courses/models.py
+
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from .validators import validate_file_extension, validate_file_size
 
 
 class Course(models.Model):
@@ -37,10 +40,7 @@ class Enrollment(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(
-                fields=["student", "course"],
-                name="unique_enrollment"
-            )
+            models.UniqueConstraint(fields=["student", "course"], name="unique_enrollment")
         ]
 
     def __str__(self):
@@ -59,7 +59,10 @@ class CourseMaterial(models.Model):
         related_name="materials_uploaded",
     )
     title = models.CharField(max_length=200)
-    file = models.FileField(upload_to="course_materials/")
+    file = models.FileField(
+        upload_to="course_materials/",
+        validators=[validate_file_extension, validate_file_size],
+    )
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -86,10 +89,7 @@ class Feedback(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(
-                fields=["course", "student"],
-                name="unique_feedback"
-            )
+            models.UniqueConstraint(fields=["course", "student"], name="unique_feedback")
         ]
 
     def __str__(self):
