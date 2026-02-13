@@ -50,7 +50,10 @@
       <div class="card" style="margin-bottom: 16px;">
         <div class="card-body">
           <span class="badge">
-            Logged in as: <strong style="margin-left:6px;">{{ user.username }}</strong>
+            Logged in as:
+            <strong style="margin-left:6px;">
+              <a href="{% url 'user_home' user.username %}">{{ user.username }}</a>
+            </strong>
             <span style="opacity:.7;">({{ user.role }})</span>
           </span>
         </div>

@@ -1,13 +1,13 @@
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
-from .forms import RegisterForm, LoginForm, StatusUpdateForm
+from .forms import RegisterForm, StatusUpdateForm
 from .models import User, StatusUpdate
-
-from django.db.models import Q
 
 
 def register_view(request):
@@ -19,17 +19,19 @@ def register_view(request):
             return redirect("course_list")
     else:
         form = RegisterForm()
+
     return render(request, "accounts/register.html", {"form": form})
 
 
 def login_view(request):
     if request.method == "POST":
-        form = LoginForm(request, data=request.POST)
+        form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             login(request, form.get_user())
             return redirect("course_list")
     else:
-        form = LoginForm()
+        form = AuthenticationForm(request)
+
     return render(request, "accounts/login.html", {"form": form})
 
 
@@ -60,6 +62,7 @@ def user_home(request, username):
         },
     )
 
+
 @login_required
 @require_POST
 def post_status_update(request):
@@ -75,6 +78,7 @@ def post_status_update(request):
 
     return redirect("user_home", username=request.user.username)
 
+
 @login_required
 def teacher_search(request):
     if not request.user.is_teacher():
@@ -85,8 +89,7 @@ def teacher_search(request):
 
     if query:
         results = User.objects.filter(
-            Q(username__icontains=query) |
-            Q(email__icontains=query)
+            Q(username__icontains=query) | Q(email__icontains=query)
         ).order_by("username")
 
     return render(
@@ -95,12 +98,15 @@ def teacher_search(request):
         {"query": query, "results": results},
     )
 
+
 @login_required
+@require_POST
 def change_theme(request):
-    if request.method == "POST":
-        theme = request.POST.get("theme")
-        allowed = {choice[0] for choice in User.Themes.choices}
-        if theme in allowed:
-            request.user.theme = theme
-            request.user.save(update_fields=["theme"])
+    theme = request.POST.get("theme")
+    allowed = {choice[0] for choice in User.Themes.choices}
+
+    if theme in allowed:
+        request.user.theme = theme
+        request.user.save(update_fields=["theme"])
+
     return redirect(request.META.get("HTTP_REFERER", "course_list"))

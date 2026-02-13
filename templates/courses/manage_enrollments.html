@@ -7,7 +7,7 @@
 <ul>
   {% for e in enrollments %}
     <li>
-      <strong>{{ e.student.username }}</strong>
+      <strong><a href="{% url 'user_home' e.student.username %}">{{ e.student.username }}</a></strong>
       {% if e.is_blocked %}
         <span style="color:red;">(blocked)</span>
         <form method="post" action="{% url 'unblock_student' course.id e.id %}" style="display:inline;">
