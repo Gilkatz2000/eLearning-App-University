@@ -6,8 +6,15 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
-from .forms import RegisterForm, StatusUpdateForm
 from .models import User, StatusUpdate
+
+# Robust import: supports either RegisterForm or CustomUserCreationForm
+try:
+    from .forms import RegisterForm
+except ImportError:
+    from .forms import CustomUserCreationForm as RegisterForm
+
+from .forms import StatusUpdateForm
 
 
 def register_view(request):

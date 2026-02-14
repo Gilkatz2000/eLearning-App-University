@@ -9,8 +9,10 @@
   {% for c in courses %}
     <li>
       <a href="{% url 'course_detail' c.id %}">{{ c.title }}</a>
-      (Teacher: <a href="{% url 'user_home' c.teacher.username %}">{{ c.teacher.username }}</a>)
-
+      (Teacher:
+      <a href="{% url 'user_home' c.teacher.username %}">
+        {{ c.teacher.username }}
+      </a>)
     </li>
   {% empty %}
     <li>No courses yet.</li>

@@ -1,21 +1,43 @@
-<h1>Feedback for: {{ course.title }}</h1>
+{% extends "base.html" %}
 
-{% if avg_rating %}
-  <p><strong>Average rating:</strong> {{ avg_rating|floatformat:1 }}/5</p>
-{% else %}
-  <p><strong>Average rating:</strong> No feedback yet</p>
-{% endif %}
+{% block title %}Course Feedback{% endblock %}
 
-<ul>
-  {% for fb in feedbacks %}
-    <li>
-      <strong><a href="{% url 'user_home' fb.student.username %}">{{ fb.student.username }}</a></strong> — {{ fb.rating }}/5<br>
-      {% if fb.comment %}{{ fb.comment }}<br>{% endif %}
-      <small>{{ fb.created_at }}</small>
-    </li>
-  {% empty %}
-    <li>No feedback yet.</li>
-  {% endfor %}
-</ul>
+{% block content %}
+  <h1>Feedback for: {{ course.title }}</h1>
 
-<p><a href="{% url 'course_detail' course.id %}">Back to course</a></p>
+  <p>
+    <strong>Average rating:</strong>
+    {% if avg_rating %}
+      {{ avg_rating|floatformat:1 }}/5
+    {% else %}
+      No feedback yet
+    {% endif %}
+  </p>
+
+  <ul>
+    {% for fb in feedbacks %}
+      <li style="margin-bottom: 12px;">
+        <strong>
+          <a href="{% url 'user_home' fb.student.username %}">
+            {{ fb.student.username }}
+          </a>
+        </strong>
+        — {{ fb.rating }}/5
+        <br>
+
+        {% if fb.comment %}
+          {{ fb.comment|linebreaksbr }}
+          <br>
+        {% endif %}
+
+        <small>{{ fb.created_at }}</small>
+      </li>
+    {% empty %}
+      <li>No feedback yet.</li>
+    {% endfor %}
+  </ul>
+
+  <p>
+    <a href="{% url 'course_detail' course.id %}">Back to course</a>
+  </p>
+{% endblock %}
