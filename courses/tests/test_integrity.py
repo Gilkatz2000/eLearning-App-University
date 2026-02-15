@@ -4,7 +4,6 @@ from django.urls import reverse
 from courses.models import Course, Enrollment, Feedback
 from tests.helpers import make_teacher, make_student
 
-
 class CourseIntegrityTests(TestCase):
     def setUp(self):
         self.teacher = make_teacher("alice", "pass")

@@ -6,7 +6,6 @@ from django.urls import reverse
 from courses.models import Course, Enrollment, Feedback
 from tests.helpers import make_teacher, make_student
 
-
 class CourseFeedbackTests(TestCase):
     def setUp(self):
         self.teacher = make_teacher(username="alice", password="pass")

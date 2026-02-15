@@ -4,7 +4,6 @@ from django.urls import reverse
 
 from tests.helpers import make_teacher, make_student
 
-
 class UserLookupTests(APITestCase):
     def setUp(self):
         self.teacher = make_teacher("alice", "pass")
@@ -31,7 +30,7 @@ class UserLookupTests(APITestCase):
         url = reverse("api_user_by_username", kwargs={"username": "carl"})
         resp = self.client.get(url)
 
-        # Depending on your implementation you might return 403 or 404 (both acceptable)
+        # Depending on the implementation the can be a return 403 or 404. both are acceptable!
         self.assertIn(resp.status_code, (status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND))
 
     def test_teacher_can_view_other_user(self):

@@ -5,7 +5,6 @@ from courses.models import Course, Enrollment
 from notifications.models import Notification
 from tests.helpers import make_teacher, make_student
 
-
 class CourseModerationTests(TestCase):
     def setUp(self):
         self.owner_teacher = make_teacher("alice", "pass")

@@ -8,7 +8,6 @@ from courses.models import Course, Enrollment
 from notifications.models import Notification
 from tests.helpers import make_teacher, make_student
 
-
 class CourseMaterialUploadTests(TestCase):
     def setUp(self):
         self.teacher = make_teacher(username="alice", password="pass")

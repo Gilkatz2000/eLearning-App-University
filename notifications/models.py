@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.db import models
 
-
 class Notification(models.Model):
     to_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -12,7 +11,6 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # optional: helpful for debugging/traceability
     link = models.CharField(max_length=255, blank=True)
 
     def __str__(self):

@@ -8,7 +8,6 @@ from django.views.decorators.http import require_POST
 
 from .models import User, StatusUpdate
 
-# Robust import: supports either RegisterForm or CustomUserCreationForm
 try:
     from .forms import RegisterForm
 except ImportError:
@@ -29,7 +28,6 @@ def register_view(request):
 
     return render(request, "accounts/register.html", {"form": form})
 
-
 def login_view(request):
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
@@ -41,12 +39,10 @@ def login_view(request):
 
     return render(request, "accounts/login.html", {"form": form})
 
-
 @login_required
 def logout_view(request):
     logout(request)
     return redirect("login")
-
 
 @login_required
 def user_home(request, username):
@@ -69,7 +65,6 @@ def user_home(request, username):
         },
     )
 
-
 @login_required
 @require_POST
 def post_status_update(request):
@@ -84,7 +79,6 @@ def post_status_update(request):
         status.save()
 
     return redirect("user_home", username=request.user.username)
-
 
 @login_required
 def teacher_search(request):
@@ -104,7 +98,6 @@ def teacher_search(request):
         "accounts/teacher_search.html",
         {"query": query, "results": results},
     )
-
 
 @login_required
 @require_POST

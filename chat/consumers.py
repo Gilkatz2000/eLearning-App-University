@@ -6,7 +6,6 @@ from django.utils import timezone
 
 from courses.models import Course, Enrollment
 
-
 class CourseChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.course_id = int(self.scope["url_route"]["kwargs"]["course_id"])
@@ -40,6 +39,15 @@ class CourseChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         user = self.scope["user"]
+        if not user.is_authenticated:
+            await self.close()
+            return
+
+        allowed = await self.user_allowed_in_course(user_id=user.id, course_id=self.course_id)
+        if not allowed:
+            await self.close()
+            return
+
         data = json.loads(text_data)
         message = (data.get("message") or "").strip()
         if not message:
@@ -72,6 +80,7 @@ class CourseChatConsumer(AsyncWebsocketConsumer):
         if not course:
             return False
 
+        # Teacher owner always allowed
         if course.teacher_id == user_id:
             return True
 

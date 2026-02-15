@@ -15,5 +15,6 @@ urlpatterns = [
     path("<int:course_id>/enrollments/<int:enrollment_id>/block/", views.block_student, name="block_student"),
     path("<int:course_id>/enrollments/<int:enrollment_id>/unblock/", views.unblock_student, name="unblock_student"),
     path("<int:course_id>/enrollments/<int:enrollment_id>/remove/", views.remove_student, name="remove_student"),
-
+    
+    path("<int:course_id>/materials/<int:material_id>/download/", views.download_material, name="download_material"),
 ]

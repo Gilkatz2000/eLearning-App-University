@@ -1,7 +1,3 @@
-/* ===========================
-   Global Theme (No framework)
-   =========================== */
-
 :root {
   --surface: rgba(255, 255, 255, 0.06);
   --surface-2: rgba(255, 255, 255, 0.09);
@@ -9,9 +5,9 @@
   --text: rgba(255, 255, 255, 0.92);
   --muted: rgba(255, 255, 255, 0.65);
 
-  --primary: #7c3aed; /* violet */
+  --primary: #7c3aed; 
   --primary-2: #a78bfa;
-  --accent: #22c55e; /* green */
+  --accent: #22c55e; 
   --danger: #ef4444;
   --warn: #f59e0b;
 
@@ -24,7 +20,6 @@
 
   --max: 1100px;
 
-  /* Inputs: default (dark themes) */
   --input-bg: rgba(0, 0, 0, 0.18);
   --input-border: rgba(255, 255, 255, 0.14);
   --input-border-hover: rgba(255, 255, 255, 0.22);
@@ -37,10 +32,6 @@
     radial-gradient(800px 500px at 70% 85%, rgba(59, 130, 246, 0.18), transparent 60%),
     linear-gradient(180deg, #070a14 0%, #0b1020 60%, #090c18 100%);
 }
-
-/* ===========================
-   Theme Background Overrides
-   =========================== */
 
 body.theme-midnight {
   --bg-grad:
@@ -64,16 +55,15 @@ body.theme-sunset {
 }
 
 body.theme-light {
-  --text: #111827;        /* dark slate */
-  --muted: #4b5563;       /* gray */
+  --text: #111827;        
+  --muted: #4b5563;      
   --border: rgba(0,0,0,0.12);
   --surface: rgba(0,0,0,0.05);
   --surface-2: rgba(0,0,0,0.08);
 
-  /* Inputs: make them CLEAR on light backgrounds */
   --input-bg: rgba(255, 255, 255, 0.92);
-  --input-border: rgba(17, 24, 39, 0.18);         /* darker border */
-  --input-border-hover: rgba(17, 24, 39, 0.28);   /* even darker on hover */
+  --input-border: rgba(17, 24, 39, 0.18);       
+  --input-border-hover: rgba(17, 24, 39, 0.28);  
   --input-focus: rgba(124, 58, 237, 0.55);
   --input-focus-ring: rgba(124, 58, 237, 0.18);
 
@@ -82,10 +72,6 @@ body.theme-light {
     radial-gradient(900px 500px at 85% 20%, rgba(34, 197, 94, 0.08), transparent 55%),
     linear-gradient(180deg, #f8fafc 0%, #eef2ff 50%, #f1f5f9 100%);
 }
-
-/* ===========================
-   Base Reset / Body
-   =========================== */
 
 *,
 *::before,
@@ -132,10 +118,6 @@ hr {
   padding: 22px 0 40px;
 }
 
-/* ===========================
-   Page Title + Headings
-   =========================== */
-
 h1, h2, h3 {
   line-height: 1.15;
   margin: 0 0 14px;
@@ -146,10 +128,6 @@ h2 { font-size: clamp(22px, 3vw, 28px); color: var(--text); }
 h3 { font-size: 18px; color: var(--text); opacity: 0.95; }
 p  { margin: 0 0 14px; color: var(--text); opacity: 0.88; }
 small { color: var(--muted); }
-
-/* ===========================
-   Layout Helpers
-   =========================== */
 
 .grid {
   display: grid;
@@ -175,10 +153,6 @@ small { color: var(--muted); }
 }
 
 .spacer { height: 10px; }
-
-/* ===========================
-   Navbar
-   =========================== */
 
 .navbar {
   position: sticky;
@@ -219,10 +193,6 @@ body.theme-light .navbar {
   background: linear-gradient(135deg, rgba(124,58,237,1), rgba(34,197,94,0.85));
   box-shadow: var(--shadow-sm);
 }
-
-/* ===========================
-   Navbar
-   =========================== */
 
 .navbar {
   position: sticky;
@@ -272,7 +242,6 @@ body.theme-light .navbar {
   flex-wrap: wrap;
 }
 
-/* regular nav links */
 .nav-links a {
   display: inline-flex;
   align-items: center;
@@ -297,15 +266,10 @@ body.theme-light .nav-links a:hover {
   border-color: rgba(0,0,0,0.10);
 }
 
-/* ===========================
-   Theme dropdown (no <select>)
-   =========================== */
-
 .theme-menu {
   position: relative;
 }
 
-/* make summary look like a nav link */
 .theme-trigger {
   display: inline-flex;
   align-items: center;
@@ -331,7 +295,6 @@ body.theme-light .theme-trigger:hover {
   border-color: rgba(0,0,0,0.10);
 }
 
-/* remove default arrow marker */
 .theme-trigger {
   list-style: none;
 }
@@ -339,7 +302,6 @@ body.theme-light .theme-trigger:hover {
   display: none;
 }
 
-/* dropdown container */
 .theme-dropdown {
   position: absolute;
   top: 44px;
@@ -358,14 +320,12 @@ body.theme-light .theme-dropdown {
   border-color: rgba(0,0,0,0.12);
 }
 
-/* list layout */
 .theme-list {
   display: grid;
   gap: 6px;
   margin: 0;
 }
 
-/* buttons as menu items */
 .theme-option {
   appearance: none;
   width: 100%;
@@ -397,7 +357,6 @@ body.theme-light .theme-option:hover {
   border-color: rgba(0,0,0,0.10);
 }
 
-/* selected item */
 .theme-option.is-selected {
   border-color: rgba(167, 139, 250, 0.40);
   background: rgba(124, 58, 237, 0.18);
@@ -412,10 +371,6 @@ body.theme-light .theme-option.is-selected {
   font-weight: 900;
   opacity: 0.95;
 }
-
-/* ===========================
-   Cards
-   =========================== */
 
 .card {
   background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.05));
@@ -467,10 +422,6 @@ body.theme-light .card-footer {
   background: rgba(0,0,0,0.03);
 }
 
-/* ===========================
-   Badges / Chips
-   =========================== */
-
 .badge {
   display: inline-flex;
   align-items: center;
@@ -492,10 +443,6 @@ body.theme-light .badge {
 .badge.success { border-color: rgba(34,197,94,0.30); background: rgba(34,197,94,0.10); }
 .badge.warn { border-color: rgba(245,158,11,0.30); background: rgba(245,158,11,0.10); }
 .badge.danger { border-color: rgba(239,68,68,0.30); background: rgba(239,68,68,0.10); }
-
-/* ===========================
-   Buttons
-   =========================== */
 
 .btn, button, input[type="submit"] {
   appearance: none;
@@ -555,10 +502,6 @@ body.theme-light input[type="submit"]:hover {
   transform: none;
 }
 
-/* ===========================
-   Forms
-   =========================== */
-
 label {
   display: block;
   margin: 0 0 6px;
@@ -585,7 +528,6 @@ textarea {
   transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
 
-/* Make fields “pop” on light theme (subtle depth) */
 body.theme-light input[type="text"],
 body.theme-light input[type="email"],
 body.theme-light input[type="password"],
@@ -609,7 +551,6 @@ input:focus, select:focus, textarea:focus {
   background: var(--input-bg);
 }
 
-/* Optional: placeholder readability */
 ::placeholder { color: var(--muted); opacity: 0.85; }
 
 .helptext {
@@ -632,10 +573,6 @@ input:focus, select:focus, textarea:focus {
   color: var(--text);
 }
 
-/* ===========================
-   Messages / Alerts
-   =========================== */
-
 .alert {
   padding: 12px 14px;
   border-radius: 16px;
@@ -653,10 +590,6 @@ body.theme-light .alert {
 .alert.info { border-color: rgba(59,130,246,0.30); background: rgba(59,130,246,0.10); }
 .alert.warn { border-color: rgba(245,158,11,0.30); background: rgba(245,158,11,0.10); }
 .alert.danger { border-color: rgba(239,68,68,0.30); background: rgba(239,68,68,0.10); }
-
-/* ===========================
-   Tables
-   =========================== */
 
 .table {
   width: 100%;
@@ -701,19 +634,11 @@ body.theme-light .table tr:hover td {
   background: rgba(0,0,0,0.03);
 }
 
-/* ===========================
-   Lists
-   =========================== */
-
 .list {
   margin: 0;
   padding-left: 18px;
 }
 .list li { margin: 6px 0; color: var(--text); opacity: 0.88; }
-
-/* ===========================
-   Profile / Home page blocks
-   =========================== */
 
 .profile {
   display: flex;
@@ -736,10 +661,6 @@ body.theme-light .table tr:hover td {
   object-fit: cover;
   border-radius: 20px;
 }
-
-/* ===========================
-   Chat Styling
-   =========================== */
 
 .chat-shell {
   display: grid;
@@ -801,10 +722,6 @@ body.theme-light .chat-line {
 @media (max-width: 650px) {
   .chat-form { grid-template-columns: 1fr; }
 }
-
-/* ===========================
-   Footer
-   =========================== */
 
 .footer {
   margin-top: 30px;

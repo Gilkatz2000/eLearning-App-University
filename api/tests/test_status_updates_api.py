@@ -5,7 +5,6 @@ from django.urls import reverse
 from accounts.models import StatusUpdate
 from tests.helpers import make_teacher, make_student
 
-
 class StatusUpdatesTests(APITestCase):
     def setUp(self):
         self.teacher = make_teacher("alice", "pass")
