@@ -7,12 +7,18 @@
 
 <ul>
   {% for c in courses %}
-    <li>
+    <li style="margin: 8px 0;">
       <a href="{% url 'course_detail' c.id %}">{{ c.title }}</a>
       (Teacher:
       <a href="{% url 'user_home' c.teacher.username %}">
         {{ c.teacher.username }}
       </a>)
+
+      {% if user.is_authenticated %}
+        <span style="margin-left: 10px;">
+          <a href="{% url 'course_chat_room' c.id %}">Chat</a>
+        </span>
+      {% endif %}
     </li>
   {% empty %}
     <li>No courses yet.</li>

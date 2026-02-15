@@ -3,7 +3,6 @@ from django.contrib.auth.forms import UserCreationForm
 
 from .models import User, StatusUpdate
 
-
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(
         required=False,
@@ -17,7 +16,6 @@ class CustomUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Make it obvious this is a profile picture, not “documents”
         self.fields["photo"].label = "Profile photo (optional)"
         self.fields["photo"].required = False
         self.fields["photo"].widget.attrs.update(
@@ -26,10 +24,7 @@ class CustomUserCreationForm(UserCreationForm):
             }
         )
 
-
-# Keep the old import name working (accounts/views.py tries RegisterForm first)
 RegisterForm = CustomUserCreationForm
-
 
 class StatusUpdateForm(forms.ModelForm):
     class Meta:

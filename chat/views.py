@@ -4,12 +4,11 @@ from django.shortcuts import get_object_or_404, render
 
 from courses.models import Course, Enrollment
 
-
 @login_required
 def course_chat_room(request, course_id):
     course = get_object_or_404(Course, id=course_id)
 
-    # Staff/superuser can view any course chat (optional)
+    # Superuser can view any course chat
     if request.user.is_staff or request.user.is_superuser:
         return render(request, "chat/course_chat_room.html", {"course": course})
 
@@ -17,7 +16,7 @@ def course_chat_room(request, course_id):
     if course.teacher_id == request.user.id:
         return render(request, "chat/course_chat_room.html", {"course": course})
 
-    # Student: must be enrolled and not blocked
+    # Student must be enrolled and not blocked
     enrollment = Enrollment.objects.filter(course=course, student=request.user).first()
     if not enrollment or enrollment.is_blocked:
         raise PermissionDenied

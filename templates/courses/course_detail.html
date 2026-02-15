@@ -33,6 +33,7 @@
       <li><a href="{% url 'upload_material' course.id %}">Upload material</a></li>
       <li><a href="{% url 'teacher_course_feedback' course.id %}">View feedback</a></li>
       <li><a href="{% url 'manage_enrollments' course.id %}">Manage students (block/remove)</a></li>
+      <li><a href="{% url 'course_chat_room' course.id %}">Open course chat</a></li>
     </ul>
   </div>
 {% endif %}
@@ -40,17 +41,28 @@
 <hr>
 
 <h2>Materials</h2>
-{% if course.materials.all %}
-  <ul>
-    {% for m in course.materials.all %}
-      <li style="margin: 8px 0;">
-        <a href="{{ m.file.url }}"><strong>{{ m.title }}</strong></a>
-        <span style="opacity: .75;">— uploaded {{ m.uploaded_at|date:"Y-m-d H:i" }}</span>
-      </li>
-    {% endfor %}
-  </ul>
+
+{% if can_view_materials %}
+  {% if materials %}
+    <ul>
+      {% for m in materials %}
+        <li style="margin: 8px 0;">
+          <a href="{% url 'download_material' course.id m.id %}">
+            <strong>{{ m.title }}</strong>
+          </a>
+          <span style="opacity: .75;">— uploaded {{ m.uploaded_at|date:"Y-m-d H:i" }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p><em>No materials yet.</em></p>
+  {% endif %}
 {% else %}
-  <p><em>No materials yet.</em></p>
+  {% if user.is_authenticated and user.is_student and enrollment and enrollment.is_blocked %}
+    <p style="opacity: .8;"><em>Materials are not available because you are blocked.</em></p>
+  {% else %}
+    <p style="opacity: .8;"><em>Materials are available only to enrolled students.</em></p>
+  {% endif %}
 {% endif %}
 
 <hr>
@@ -64,6 +76,10 @@
     {% else %}
       <p style="padding: 10px; border: 1px solid #cfe2ff; background: #e7f1ff; border-radius: 8px;">
         <strong>You are enrolled.</strong>
+      </p>
+
+      <p style="margin: 10px 0;">
+        <a href="{% url 'course_chat_room' course.id %}">💬 Open course chat</a>
       </p>
 
       <h2>Leave feedback</h2>

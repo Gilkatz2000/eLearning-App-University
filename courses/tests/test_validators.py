@@ -5,7 +5,6 @@ from django.core.exceptions import ValidationError
 from courses.models import Course, CourseMaterial
 from tests.helpers import make_teacher
 
-
 class CourseMaterialValidatorTests(TestCase):
     def setUp(self):
         self.teacher = make_teacher("alice", "pass")

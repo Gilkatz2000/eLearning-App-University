@@ -4,7 +4,6 @@ from django.urls import reverse
 
 from tests.helpers import make_teacher, make_student
 
-
 class MeEndpointTests(APITestCase):
     def setUp(self):
         self.student = make_student("bob", "pass")

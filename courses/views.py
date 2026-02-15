@@ -11,6 +11,8 @@ from notifications.models import Notification
 from .forms import CourseForm, CourseMaterialForm, FeedbackForm
 from .models import Course, Enrollment, Feedback
 
+from django.http import FileResponse
+from .models import CourseMaterial
 
 @teacher_required
 def create_course(request):
@@ -44,18 +46,28 @@ def course_detail(request, course_id):
     feedbacks = course.feedbacks.select_related("student").order_by("-created_at")
     avg_rating = feedbacks.aggregate(avg=Avg("rating"))["avg"]
 
-    # ✅ FIX: compute teacher ownership in view (not template)
     is_owner_teacher = (
         request.user.is_authenticated
         and request.user.is_teacher()
         and course.teacher_id == request.user.id
     )
 
-    # Student-only feedback logic
+    # Student enrollment state (used for blocking / feedback form)
     if request.user.is_authenticated and request.user.is_student():
         enrollment = Enrollment.objects.filter(course=course, student=request.user).first()
         my_feedback = Feedback.objects.filter(course=course, student=request.user).first()
         feedback_form = FeedbackForm(instance=my_feedback, student=request.user, course=course)
+
+    # ✅ Materials visibility decision (server-side)
+    can_view_materials = False
+    if is_owner_teacher:
+        can_view_materials = True
+    elif request.user.is_authenticated and request.user.is_student():
+        if enrollment and not enrollment.is_blocked:
+            can_view_materials = True
+
+    # ✅ Provide filtered materials list to template
+    materials = course.materials.order_by("-uploaded_at") if can_view_materials else course.materials.none()
 
     return render(
         request,
@@ -67,7 +79,9 @@ def course_detail(request, course_id):
             "avg_rating": avg_rating,
             "my_feedback": my_feedback,
             "feedback_form": feedback_form,
-            "is_owner_teacher": is_owner_teacher,  # 👈 used in template
+            "is_owner_teacher": is_owner_teacher,
+            "materials": materials,
+            "can_view_materials": can_view_materials,
         },
     )
 
@@ -264,3 +278,30 @@ def remove_student(request, course_id, enrollment_id):
     )
 
     return redirect("manage_enrollments", course_id=course.id)
+
+@login_required
+def download_material(request, course_id, material_id):
+    course = get_object_or_404(Course, id=course_id)
+    material = get_object_or_404(CourseMaterial, id=material_id, course=course)
+
+    # Teacher owner can always download
+    if request.user.is_teacher() and course.teacher_id == request.user.id:
+        return FileResponse(
+            material.file.open("rb"),
+            as_attachment=True,
+            filename=material.file.name.split("/")[-1],
+        )
+
+    # Students: must be enrolled and NOT blocked
+    if request.user.is_student():
+        enrollment = Enrollment.objects.filter(course=course, student=request.user).first()
+        if not enrollment or enrollment.is_blocked:
+            raise PermissionDenied
+
+        return FileResponse(
+            material.file.open("rb"),
+            as_attachment=True,
+            filename=material.file.name.split("/")[-1],
+        )
+
+    raise PermissionDenied

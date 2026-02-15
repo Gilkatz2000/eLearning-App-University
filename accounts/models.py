@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
 
-
 class User(AbstractUser):
     class Roles(models.TextChoices):
         STUDENT = "STUDENT", "Student"
@@ -18,7 +17,6 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=Roles.choices, default=Roles.STUDENT)
     photo = models.ImageField(upload_to="profile_photos/", blank=True, null=True)
 
-    # user theme preference
     theme = models.CharField(
         max_length=20,
         choices=Themes.choices,
@@ -30,7 +28,6 @@ class User(AbstractUser):
 
     def is_teacher(self):
         return self.role == self.Roles.TEACHER
-
 
 class StatusUpdate(models.Model):
     user = models.ForeignKey(

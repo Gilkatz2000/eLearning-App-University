@@ -1,23 +1,37 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>Course Chat</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>Course Chat: {{ course.title }}</h1>
+{% block title %}Course Chat{% endblock %}
 
-<div style="margin: 8px 0;">
-  <strong>Status:</strong> <span id="chat-status">Connecting…</span>
+{% block content %}
+
+<div class="chat-page">
+  <h1 class="chat-title">Course Chat: {{ course.title }}</h1>
+
+  <div class="chat-status">
+    <strong>Status:</strong> <span id="chat-status">Connecting…</span>
+  </div>
+
+  <div id="chat-log" class="chat-log"></div>
+
+  <form id="chat-form" class="chat-form">
+    <input
+      id="chat-message-input"
+      class="chat-input"
+      type="text"
+      placeholder="Type a message..."
+      autocomplete="off"
+    >
+    <button id="chat-send-btn" class="chat-send-btn" type="submit">
+      Send
+    </button>
+  </form>
+
+  <p class="chat-links">
+    <a href="{% url 'course_detail' course.id %}">Back to course</a>
+    <span class="chat-sep">|</span>
+    <a href="{% url 'course_list' %}">Back to courses</a>
+  </p>
 </div>
-
-<div id="chat-log" style="border:1px solid #ccc; padding:10px; height:300px; overflow:auto;"></div>
-
-<form id="chat-form" style="margin-top:10px;">
-  <input id="chat-message-input" type="text" size="60" placeholder="Type a message..." autocomplete="off">
-  <button id="chat-send-btn" type="submit">Send</button>
-</form>
 
 <script>
   const courseId = "{{ course.id }}";
@@ -36,12 +50,12 @@
 
   function addLine(line) {
     const p = document.createElement("p");
+    p.className = "chat-line";
     p.textContent = line;
     log.appendChild(p);
     log.scrollTop = log.scrollHeight;
   }
 
-  // Create socket
   const chatSocket = new WebSocket(wsUrl);
 
   chatSocket.onopen = function() {
@@ -90,7 +104,4 @@
   });
 </script>
 
-<p><a href="/courses/">Back to courses</a></p>
-
-</body>
-</html>
+{% endblock %}
