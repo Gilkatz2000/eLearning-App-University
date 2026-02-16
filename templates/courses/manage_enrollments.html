@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Manage Students - {{ course.title }}{% endblock %}
-
 {% block content %}
 <h1>Manage Students: {{ course.title }}</h1>
-
 <ul>
   {% for e in enrollments %}
     <li>

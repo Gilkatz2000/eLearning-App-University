@@ -1,9 +1,6 @@
 {% extends "base.html" %}
-
 {% block title %}Course Chat{% endblock %}
-
 {% block content %}
-
 <div class="chat-page">
   <h1 class="chat-title">Course Chat: {{ course.title }}</h1>
 
@@ -12,7 +9,6 @@
   </div>
 
   <div id="chat-log" class="chat-log"></div>
-
   <form id="chat-form" class="chat-form">
     <input
       id="chat-message-input"
@@ -57,9 +53,8 @@
   }
 
   const chatSocket = new WebSocket(wsUrl);
-
   chatSocket.onopen = function() {
-    setStatus("✅ Connected");
+    setStatus("Connected");
     addLine("✅ Connected to chat.");
     input.focus();
   };
