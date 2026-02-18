@@ -17,6 +17,7 @@ def _setup_course_with_enrollment(blocked: bool | None):
 
     return student, course
 
+
 def _ws_path(course_id: int) -> str:
     # matches chat/routing.py: r"ws/courses/(?P<course_id>\d+)/chat/$"
     return f"/ws/courses/{course_id}/chat/"
@@ -30,9 +31,10 @@ async def test_enrolled_student_can_connect_to_course_chat():
     communicator.scope["user"] = student
 
     connected, _ = await communicator.connect()
-    assert connected is True
-
-    await communicator.disconnect()
+    try:
+        assert connected is True
+    finally:
+        await communicator.disconnect()
 
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
@@ -42,8 +44,11 @@ async def test_blocked_student_cannot_connect_to_course_chat():
     communicator = WebsocketCommunicator(application, _ws_path(course.id))
     communicator.scope["user"] = student
 
-    connected, _ = await communicator.connect()
-    assert connected is False
+    try:
+        connected, _ = await communicator.connect()
+        assert connected is False
+    finally:
+        await communicator.disconnect()
 
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
@@ -53,5 +58,8 @@ async def test_not_enrolled_student_cannot_connect_to_course_chat():
     communicator = WebsocketCommunicator(application, _ws_path(course.id))
     communicator.scope["user"] = student
 
-    connected, _ = await communicator.connect()
-    assert connected is False
+    try:
+        connected, _ = await communicator.connect()
+        assert connected is False
+    finally:
+        await communicator.disconnect()
