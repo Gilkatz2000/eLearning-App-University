@@ -203,6 +203,18 @@ body.theme-light .navbar {
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text);
+  text-decoration: none;
+}
+
+.brand-logo {
+  width: 40px !important;
+  height: 40px !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+  flex: 0 0 auto;
 }
 
 .brand-badge {

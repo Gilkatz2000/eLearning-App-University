@@ -9,6 +9,7 @@
   </div>
 
   <div id="chat-log" class="chat-log"></div>
+
   <form id="chat-form" class="chat-form">
     <input
       id="chat-message-input"
@@ -52,7 +53,26 @@
     log.scrollTop = log.scrollHeight;
   }
 
+  function formatTimestamp(isoString) {
+    const date = new Date(isoString);
+
+    const formattedDate = date.toLocaleDateString(undefined, {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+
+    const formattedTime = date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    });
+
+    return `${formattedDate} • ${formattedTime}`;
+  }
+
   const chatSocket = new WebSocket(wsUrl);
+
   chatSocket.onopen = function() {
     setStatus("Connected");
     addLine("✅ Connected to chat.");
@@ -62,10 +82,20 @@
   chatSocket.onmessage = function(e) {
     try {
       const data = JSON.parse(e.data);
-      const ts = data.timestamp ? data.timestamp : "";
-      const user = data.username ? data.username : "unknown";
-      const msg = data.message ? data.message : "";
-      addLine(`[${ts}] ${user}: ${msg}`);
+
+      const ts = data.timestamp || "";
+      const formattedTs = ts ? formatTimestamp(ts) : "";
+      const msg = data.message || "";
+
+      // System message (no username)
+      if (data.event_type === "system") {
+        addLine(`${formattedTs} ${msg}`);
+        return;
+      }
+
+      // User message
+      const user = data.username || "unknown";
+      addLine(`${formattedTs} ${user}: ${msg}`);
     } catch (err) {
       addLine("⚠️ Received a message that could not be parsed.");
     }

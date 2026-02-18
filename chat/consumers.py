@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from courses.models import Course, Enrollment
 
+
 class CourseChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.course_id = int(self.scope["url_route"]["kwargs"]["course_id"])
@@ -24,11 +25,12 @@ class CourseChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
+        # Broadcast a system "joined" message (no username field)
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 "type": "chat.message",
-                "username": "system",
+                "event_type": "system",
                 "message": f"{user.username} joined the chat",
                 "timestamp": timezone.now().isoformat(timespec="seconds"),
             },
@@ -57,6 +59,7 @@ class CourseChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             {
                 "type": "chat.message",
+                "event_type": "user",
                 "username": user.username,
                 "message": message,
                 "timestamp": timezone.now().isoformat(timespec="seconds"),
@@ -64,15 +67,8 @@ class CourseChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def chat_message(self, event):
-        await self.send(
-            text_data=json.dumps(
-                {
-                    "username": event["username"],
-                    "message": event["message"],
-                    "timestamp": event["timestamp"],
-                }
-            )
-        )
+        # Send the full event to the client (includes event_type)
+        await self.send(text_data=json.dumps(event))
 
     @database_sync_to_async
     def user_allowed_in_course(self, user_id: int, course_id: int) -> bool:
