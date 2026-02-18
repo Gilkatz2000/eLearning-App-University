@@ -20,7 +20,7 @@ class User(AbstractUser):
     theme = models.CharField(
         max_length=20,
         choices=Themes.choices,
-        default=Themes.LIGHT,
+        default=Themes.DEFAULT,
     )
 
     def is_student(self):
